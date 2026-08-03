@@ -1,0 +1,9 @@
+# 源字体与生成物通常较大，按需决定是否入库
+source/*
+!source/.gitkeep
+output/*
+!output/.gitkeep
+__pycache__/
+*.pyc
+.venv/
+venv/
