@@ -11,16 +11,29 @@ OUTPUT_DIR="${OUTPUT_DIR:-$ROOT/output}"
 
 mkdir -p "$SOURCE_DIR" "$OUTPUT_DIR"
 
-if ! command -v pyftsubset >/dev/null 2>&1; then
-  echo "未找到 pyftsubset。请先安装："
-  echo "  pip install -r \"$ROOT/requirements.txt\""
+# 优先使用本目录 .venv 中的 pyftsubset（目录改名后也不依赖全局 PATH）
+if [[ -x "$ROOT/.venv/bin/pyftsubset" ]]; then
+  PYFTSUBSET="$ROOT/.venv/bin/pyftsubset"
+elif command -v pyftsubset >/dev/null 2>&1; then
+  PYFTSUBSET="$(command -v pyftsubset)"
+else
+  echo "未找到 pyftsubset。请在本目录重建虚拟环境并安装依赖："
+  echo "  cd \"$ROOT\""
+  echo "  python3 -m venv .venv"
+  echo "  source .venv/bin/activate"
+  echo "  pip install -r requirements.txt"
   exit 1
 fi
 
 if [[ ! -f "$CHARSET_FILE" ]]; then
-  echo "字表不存在: $CHARSET_FILE"
-  echo "可先运行: bash \"$ROOT/build-charset.sh\""
-  exit 1
+  # 相对路径时，按脚本所在目录解析
+  if [[ "$CHARSET_FILE" != /* && -f "$ROOT/$CHARSET_FILE" ]]; then
+    CHARSET_FILE="$ROOT/$CHARSET_FILE"
+  else
+    echo "字表不存在: $CHARSET_FILE"
+    echo "可先运行: bash \"$ROOT/build-charset.sh\""
+    exit 1
+  fi
 fi
 
 shopt -s nullglob
@@ -57,7 +70,7 @@ for src in "${inputs[@]}"; do
 
   out="$OUTPUT_DIR/${name}.subset.woff2"
   echo "→ 子集化: $base"
-  pyftsubset "$src" \
+  "$PYFTSUBSET" "$src" \
     --text-file="$CHARSET_FILE" \
     --output-file="$out" \
     --flavor=woff2 \
