@@ -1,8 +1,14 @@
-# 源字体与生成物通常较大，按需决定是否入库
-source/*
+# 源字体与生成物通常较大，不入库（仅保留空目录占位）
+source/**
 !source/.gitkeep
-output/*
+
+output/**
 !output/.gitkeep
+
+# 各站点扫描/合并字表不入库（按 <SITE>/ 存放，仅保留空目录占位）
+charset-site/**
+!charset-site/.gitkeep
+
 __pycache__/
 *.pyc
 .venv/
