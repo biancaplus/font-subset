@@ -14,7 +14,7 @@ font-subset/
     charset-6500-list.txt          # 每行一字，方便查看
   charset-site/                    # 站点用字（不入库）
     <SITE>/
-      charset-site.txt             # WordPress 用字表扫描下载
+      charset-site.txt             # 自行扫描的站点全站用字
       charset-site-list.txt
       charset-merged.txt           # merge-charset.sh 生成：6500 ∪ 站点用字
       charset-merged-list.txt
@@ -35,7 +35,7 @@ font-subset/
 - 标准：[国务院公布《通用规范汉字表》](https://www.gov.cn/zhengce/zhengceku/2013-08/19/content_1289.htm)
 - 文本转写：[shengdoushi/common-standard-chinese-characters-table](https://github.com/shengdoushi/common-standard-chinese-characters-table)
 - 通用档：`charset/` 内 **一级 ∪ 二级 = 6500 字**，再加拉丁字母数字与常用中英文标点
-- 站点档：WordPress 后台 **工具 → 用字表扫描** 下载，放入 `charset-site/<SITE>/`
+- 站点档：自行扫描站点全站文字（不限 WordPress / Next.js 等任何站点），放入 `charset-site/<SITE>/`
 
 ## 使用步骤
 

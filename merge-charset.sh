@@ -49,7 +49,7 @@ fi
 
 if [[ ! -f "$SITE_FILE" ]]; then
   echo "站点用字表不存在: $SITE_FILE"
-  echo "请先将 WordPress「用字表扫描」下载的 charset-site.txt 放到: $SITE_DIR/"
+  echo "请先将扫描得到的站点用字表 charset-site.txt 放到: $SITE_DIR/"
   exit 1
 fi
 
