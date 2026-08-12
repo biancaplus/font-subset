@@ -1,6 +1,7 @@
 # 字体子集化（多站点）
 
-本目录用于把完整中文字体按「通用规范汉字一二级 6500 + 拉丁/标点」或「站点用字」做成 woff2 子集。  
+本目录用于把完整中文字体按 **「通用规范汉字一二级 6500 + 拉丁/标点」** 或 **「站点用字」** 做字体子集。  
+**输出格式默认与源字体一致**（`otf→.subset.otf`、`woff2→.subset.woff2` 等）；站点线上常用 woff2，可把源字体放在 `source/` 为 `.woff2`，或用 `OUTPUT_FORMAT=woff2` 从 otf/ttf 转出。  
 支持按站点隔离：源字体、站点字表、输出产物都落在各自站点目录。
 
 ## 目录说明
@@ -20,7 +21,7 @@ font-subset/
   source/                          # 源字体（不入库）
     <SITE>/                        # 如 source/site1/*.otf
   output/                          # 子集产物（不入库）
-    <SITE>/                        # 如 output/site1/*.subset.woff2
+    <SITE>/                        # 如 output/site1/*.subset.otf / *.subset.woff2
   build-charset.sh                 # 重建通用 charset-6500
   merge-charset.sh                 # 合并 6500 + 站点用字 → charset-merged
   subset.sh                        # 按站点子集化
@@ -104,10 +105,18 @@ SITE=site1 bash merge-charset.sh
 SITE=site1 CHARSET=merged bash subset.sh
 ```
 
-`.ttc` 合集可指定字体序号（默认 0）：
+`.ttc` 合集可指定字体序号（默认 0）；子集结果为**单个**字体文件（默认 `.subset.otf`）：
 
 ```bash
 SITE=site1 FONT_NUMBER=0 bash subset.sh
+SITE=site1 TTC_OUTPUT_EXT=woff2 bash subset.sh
+```
+
+强制指定输出格式（覆盖「随源扩展名」）：
+
+```bash
+# 源为 otf，但产出 woff2 供线上使用
+SITE=site1 OUTPUT_FORMAT=woff2 bash subset.sh
 ```
 
 也可直接指定字表文件：
@@ -118,7 +127,19 @@ SITE=site1 CHARSET_FILE=charset/charset-6500.txt bash subset.sh
 
 ### 5. 取用产物
 
-在 `output/<SITE>/` 查看 `*.subset.woff2`，替换该站点主题 `assets/fonts/` 与 OSS 字体，并同步改 `@font-face` / preload。
+在 `output/<SITE>/` 查看 `*.subset.*`，替换该站点主题 `assets/fonts/` 与 OSS 字体，并同步改 `@font-face` / preload（`format()` 与扩展名一致）。
+
+### 输出格式对照
+
+| 源格式   | 默认子集输出                           | pyftsubset                      |
+| -------- | -------------------------------------- | ------------------------------- |
+| `.ttf`   | `.subset.ttf`                          | 无 `--flavor`                   |
+| `.otf`   | `.subset.otf`                          | 无 `--flavor`                   |
+| `.woff`  | `.subset.woff`                         | `--flavor=woff`                 |
+| `.woff2` | `.subset.woff2`                        | `--flavor=woff2`（需 `brotli`） |
+| `.ttc`   | `.subset.otf`（可调 `TTC_OUTPUT_EXT`） | 单字体抽出，非 ttc 合集         |
+
+任意源格式均可通过 `OUTPUT_FORMAT=woff2` 等强制转成目标格式。
 
 ## 多站点示例
 
@@ -146,3 +167,4 @@ charset-site/site2/ ...
 - `charset/` 只放通用字表；站点扫描结果放 `charset-site/<SITE>/`，且默认不进 git。
 - 本脚本只做本地文件处理，不会自动改 WordPress 或上传 OSS。
 - 表外汉字会回退到 `font-family` 后面的系统字体，一般可接受。
+- 产出 `woff2` 时需安装 `brotli`（见 `requirements.txt`）；仅 `ttf/otf` 子集可不装 brotli。
